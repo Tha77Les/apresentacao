@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apresentação - Lista de Tarefas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #2c3e50;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 40px;
+            color: #2c3e50;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        h2 {
+            margin: 40px 0 20px;
+            color: #2196F3;
+            font-size: 1.8em;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+        }
+        
+        .section {
+            margin-bottom: 50px;
+            padding: 30px;
+            background-color: #f9f9f9;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+        }
+        
+        .section:hover {
+            transform: translateY(-5px);
+        }
+        
+        .section p {
+            margin-bottom: 20px;
+            font-size: 1.1em;
+            color: #555;
+        }
+        
+        .code {
+            background-color: #2c3e50;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-family: 'Consolas', monospace;
+            color: #ecf0f1;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .code pre {
+            white-space: pre-wrap;
+            line-height: 1.5;
+        }
+        
+        .voltar {
+            display: inline-block;
+            margin-top: 40px;
+            padding: 15px 30px;
+            background: linear-gradient(45deg, #4caf50, #45a049);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .voltar:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+        }
+        
+        .demo {
+            margin: 25px 0;
+            padding: 25px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e0e0e0;
+        }
+        
+        .demo-item {
+            margin-bottom: 15px;
+            padding: 15px;
+            background-color: #f0f0f0;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .demo-item:hover {
+            transform: translateX(5px);
+        }
+        
+        .demo-item.completa {
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+        
+        .demo-item.vencida {
+            background-color: #ffebee;
+            border-left: 4px solid #f44336;
+        }
+        
+        .tarefa-trabalho {
+            border-left: 4px solid #FF6B6B;
+            background-color: #FFE3E3;
+        }
+        
+        .tarefa-pessoal {
+            border-left: 4px solid #4ECDC4;
+            background-color: #E0F7F6;
+        }
+        
+        .tarefa-estudos {
+            border-left: 4px solid #FFD93D;
+            background-color: #FFF9E6;
+        }
+        
+        .tarefa-outros {
+            border-left: 4px solid #9B59B6;
+            background-color: #F5EEF8;
+        }
+        
+        .filtros-demo, .ordenacao-demo {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .filtro-btn, .ordenar-btn {
+            padding: 10px 15px;
+            background-color: #f0f0f0;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .filtro-btn:hover, .ordenar-btn:hover {
+            background-color: #e0e0e0;
+            transform: translateY(-2px);
+        }
+        
+        .filtro-btn.ativo, .ordenar-btn.ativo {
+            background-color: #2196F3;
+            color: white;
+            box-shadow: 0 2px 5px rgba(33, 150, 243, 0.3);
+        }
+        
+        .barra-progresso {
+            height: 30px;
+            background-color: #f0f0f0;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 15px 0;
+            display: flex;
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .barra-completa {
+            height: 100%;
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            transition: width 0.5s ease;
+        }
+        
+        .barra-pendente {
+            height: 100%;
+            background: linear-gradient(45deg, #FF9800, #f57c00);
+            transition: width 0.5s ease;
+        }
+        
+        .legenda-grafico {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            padding: 0 10px;
+        }
+        
+        .legenda-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+        }
+        
+        .legenda-cor {
+            width: 20px;
+            height: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .legenda-cor.completa {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+        }
+        
+        .legenda-cor.pendente {
+            background: linear-gradient(45deg, #FF9800, #f57c00);
+        }
+
+        /* Estilo para scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 5px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        
+        .input-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .input-row {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .input-group {
+            flex: 1;
+            min-width: 200px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .input-group label {
+            font-size: 0.9em;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+        
+        .demo-input {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            background-color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .demo-input:focus {
+            border-color: #2196F3;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+        }
+        
+        .demo-select {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            background-color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .demo-button {
+            padding: 12px 20px;
+            background: linear-gradient(45deg, #4caf50, #45a049);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin-top: 25px;
+            height: 45px;
+        }
+        
+        .demo-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Apresentação - Lista de Tarefas</h1>
+        
+        <div class="section">
+            <h2>1. Data de Vencimento</h2>
+            <p>Adicionamos um campo para data de vencimento nas tarefas, permitindo melhor organização e priorização.</p>
+            
+            <div class="code">
+                <pre>&lt;div class="input-group"&gt;
+    &lt;label for="data-vencimento"&gt;Data de Vencimento&lt;/label&gt;
+    &lt;input type="date" id="data-vencimento"&gt;
+&lt;/div&gt;</pre>
+            </div>
+            
+            <div class="demo">
+                <div class="input-container">
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="demo-data">Data de Vencimento</label>
+                            <input type="date" class="demo-input" id="demo-data">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="code">
+                <pre>// Validação da data
+if (!dataVencimento) {
+    alert('Por favor, selecione uma data de vencimento!');
+    return;
+}
+
+// Adição do campo de data ao objeto tarefa
+const tarefa = {
+    id: Date.now(),
+    texto: texto,
+    completa: false,
+    dataCriacao: new Date(),
+    dataVencimento: new Date(dataVencimento)
+};
+
+// Verificação de tarefas vencidas
+const hoje = new Date();
+hoje.setHours(0, 0, 0, 0);
+const dataVencimento = new Date(tarefa.dataVencimento);
+dataVencimento.setHours(0, 0, 0, 0);
+
+if (!tarefa.completa && dataVencimento < hoje) {
+    li.classList.add('vencida');</pre>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>2. Categorias com Cores</h2>
+            <p>Implementamos categorias com cores distintas para melhor visualização e organização das tarefas.</p>
+            
+            <div class="code">
+                <pre>&lt;div class="input-group"&gt;
+    &lt;label for="categoria"&gt;Categoria&lt;/label&gt;
+    &lt;select id="categoria"&gt;
+        &lt;option value=""&gt;Selecione uma categoria&lt;/option&gt;
+        &lt;option value="trabalho"&gt;Trabalho&lt;/option&gt;
+        &lt;option value="pessoal"&gt;Pessoal&lt;/option&gt;
+        &lt;option value="estudos"&gt;Estudos&lt;/option&gt;
+        &lt;option value="outros"&gt;Outros&lt;/option&gt;
+    &lt;/select&gt;
+&lt;/div&gt;</pre>
+            </div>
+            
+            <div class="demo">
+                <div class="input-container">
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="demo-categoria">Categoria</label>
+                            <select class="demo-select" id="demo-categoria">
+                                <option value="">Selecione uma categoria</option>
+                                <option value="trabalho">Trabalho</option>
+                                <option value="pessoal">Pessoal</option>
+                                <option value="estudos">Estudos</option>
+                                <option value="outros">Outros</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="code">
+                <pre>// Validação da categoria
+if (!categoria) {
+    alert('Por favor, selecione uma categoria!');
+    return;
+}
+
+// Adição da categoria ao objeto tarefa
+const tarefa = {
+    id: Date.now(),
+    texto: texto,
+    completa: false,
+    dataCriacao: new Date(),
+    dataVencimento: new Date(dataVencimento),
+    categoria: categoria
+};
+
+// Aplicação da classe de categoria
+li.classList.add(`tarefa-${tarefa.categoria}`);</pre>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>3. Filtros por Categoria</h2>
+            <p>Adicionamos a capacidade de filtrar tarefas por categoria, facilitando a visualização de tarefas específicas.</p>
+            
+            <div class="code">
+                <pre>&lt;div class="filtros-categoria"&gt;
+    &lt;button class="filtro-categoria ativo" data-categoria="todas"&gt;Todas&lt;/button&gt;
+    &lt;button class="filtro-categoria" data-categoria="trabalho"&gt;Trabalho&lt;/button&gt;
+    &lt;button class="filtro-categoria" data-categoria="pessoal"&gt;Pessoal&lt;/button&gt;
+    &lt;button class="filtro-categoria" data-categoria="estudos"&gt;Estudos&lt;/button&gt;
+    &lt;button class="filtro-categoria" data-categoria="outros"&gt;Outros&lt;/button&gt;
+&lt;/div&gt;</pre>
+            </div>
+            
+            <div class="demo">
+                <div class="filtros-demo">
+                    <button class="filtro-btn ativo">Todas</button>
+                    <button class="filtro-btn">Trabalho</button>
+                    <button class="filtro-btn">Pessoal</button>
+                    <button class="filtro-btn">Estudos</button>
+                    <button class="filtro-btn">Outros</button>
+                </div>
+            </div>
+
+            <div class="code">
+                <pre>// Variável para controle da categoria atual
+let categoriaAtual = 'todas';
+
+// Event listeners para os botões de categoria
+document.querySelectorAll('.filtro-categoria').forEach(btn => {
+    btn.addEventListener('click', () => {
+        categoriaAtual = btn.dataset.categoria;
+        atualizarLista();
+    });
+});
+
+// Lógica de filtragem por categoria
+if (categoriaAtual !== 'todas') {
+    tarefasFiltradas = tarefasFiltradas.filter(tarefa => tarefa.categoria === categoriaAtual);
+}</pre>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>4. Ordenação</h2>
+            <p>Implementamos diferentes critérios de ordenação para melhor organização das tarefas.</p>
+            
+            <div class="code">
+                <pre>&lt;div class="ordenacao"&gt;
+    &lt;button class="ordenar" data-criterio="data"&gt;Ordenar por Data&lt;/button&gt;
+    &lt;button class="ordenar" data-criterio="texto"&gt;Ordenar por Texto&lt;/button&gt;
+    &lt;button class="ordenar" data-criterio="status"&gt;Ordenar por Status&lt;/button&gt;
+&lt;/div&gt;</pre>
+            </div>
+            
+            <div class="demo">
+                <div class="ordenacao-demo">
+                    <button class="ordenar-btn">Data ↑</button>
+                    <button class="ordenar-btn">Texto A-Z</button>
+                    <button class="ordenar-btn">Status</button>
+                </div>
+            </div>
+
+            <div class="code">
+                <pre>// Variáveis para controle da ordenação
+let criterioOrdenacao = 'data';
+let ordemAscendente = true;
+
+// Função de ordenação
+function ordenarTarefas(tarefas) {
+    return [...tarefas].sort((a, b) => {
+        switch (criterioOrdenacao) {
+            case 'data':
+                return ordemAscendente 
+                    ? a.dataCriacao - b.dataCriacao 
+                    : b.dataCriacao - a.dataCriacao;
+            
+            case 'texto':
+                return ordemAscendente
+                    ? a.texto.localeCompare(b.texto)
+                    : b.texto.localeCompare(a.texto);
+            
+            case 'status':
+                return ordemAscendente
+                    ? (a.completa === b.completa ? 0 : a.completa ? 1 : -1)
+                    : (a.completa === b.completa ? 0 : a.completa ? -1 : 1);
+            
+            default:
+                return 0;
+        }
+    });
+}
+
+// Atualização da ordenação
+function atualizarOrdenacao(novoCriterio) {
+    if (criterioOrdenacao === novoCriterio) {
+        ordemAscendente = !ordemAscendente;
+    } else {
+        criterioOrdenacao = novoCriterio;
+        ordemAscendente = true;
+    }
+    
+    document.querySelectorAll('.ordenar').forEach(btn => {
+        btn.classList.remove('ativo');
+        if (btn.dataset.criterio === criterioOrdenacao) {
+            btn.classList.add('ativo');
+            btn.textContent = `Ordenar por ${btn.dataset.criterio} ${ordemAscendente ? '↑' : '↓'}`;
+        } else {
+            btn.textContent = `Ordenar por ${btn.dataset.criterio}`;
+        }
+    });
+    
+    atualizarLista();
+}</pre>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>5. Gráfico de Progresso</h2>
+            <p>Adicionamos um gráfico visual que mostra a proporção de tarefas completadas e pendentes.</p>
+            
+            <div class="code">
+                <pre>&lt;div class="grafico-container"&gt;
+    &lt;div class="barra-progresso"&gt;
+        &lt;div class="barra-completa" id="barra-completa"&gt;&lt;/div&gt;
+        &lt;div class="barra-pendente" id="barra-pendente"&gt;&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class="legenda-grafico"&gt;
+        &lt;div class="legenda-item"&gt;
+            &lt;div class="legenda-cor completa"&gt;&lt;/div&gt;
+            &lt;span&gt;Completas&lt;/span&gt;
+        &lt;/div&gt;
+        &lt;div class="legenda-item"&gt;
+            &lt;div class="legenda-cor pendente"&gt;&lt;/div&gt;
+            &lt;span&gt;Pendentes&lt;/span&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</pre>
+            </div>
+            
+            <div class="demo">
+                <div class="barra-progresso">
+                    <div class="barra-completa" style="width: 60%;"></div>
+                    <div class="barra-pendente" style="width: 40%;"></div>
+                </div>
+                <div class="legenda-grafico">
+                    <div class="legenda-item">
+                        <div class="legenda-cor completa"></div>
+                        <span>Completas (60%)</span>
+                    </div>
+                    <div class="legenda-item">
+                        <div class="legenda-cor pendente"></div>
+                        <span>Pendentes (40%)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="code">
+                <pre>// Função para atualizar o gráfico de progresso
+function atualizarGrafico() {
+    const totalTarefas = tarefas.length;
+    const completas = tarefas.filter(tarefa => tarefa.completa).length;
+    const pendentes = totalTarefas - completas;
+    
+    const barraCompleta = document.getElementById('barra-completa');
+    const barraPendente = document.getElementById('barra-pendente');
+    
+    const porcentagemCompletas = (completas / totalTarefas) * 100;
+    const porcentagemPendentes = (pendentes / totalTarefas) * 100;
+    
+    barraCompleta.style.width = `${porcentagemCompletas}%`;
+    barraPendente.style.width = `${porcentagemPendentes}%`;
+}</pre>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>6. Subtarefas</h2>
+            <p>Implementamos um sistema de subtarefas onde uma tarefa só é considerada completa quando todas as suas subtarefas estiverem completas.</p>
+            
+            <div class="code">
+                <pre>&lt;div class="subtarefas-container"&gt;
+    &lt;button class="toggle-subtarefas"&gt;
+        Subtarefas &lt;span class="contador-subtarefas"&gt;0&lt;/span&gt;
+    &lt;/button&gt;
+    &lt;div class="adicionar-subtarefa"&gt;
+        &lt;input type="text" class="subtarefa-input" placeholder="Adicionar subtarefa..."&gt;
+        &lt;button class="adicionar-subtarefa-btn"&gt;+&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;ul class="lista-subtarefas"&gt;&lt;/ul&gt;
+&lt;/div&gt;</pre>
+            </div>
+            
+            <div class="demo">
+                <div class="demo-item">
+                    <div class="subtarefas-container">
+                        <button class="toggle-subtarefas">
+                            Subtarefas <span class="contador-subtarefas">2</span>
+                        </button>
+                        <div class="adicionar-subtarefa">
+                            <input type="text" class="subtarefa-input" placeholder="Adicionar subtarefa...">
+                            <button class="adicionar-subtarefa-btn">+</button>
+                        </div>
+                        <ul class="lista-subtarefas">
+                            <li>
+                                <span>Subtarefa 1</span>
+                                <div class="acoes">
+                                    <button class="completar">Completar</button>
+                                    <button class="remover">Remover</button>
+                                </div>
+                            </li>
+                            <li class="completa">
+                                <span>Subtarefa 2</span>
+                                <div class="acoes">
+                                    <button class="completar">Reativar</button>
+                                    <button class="remover">Remover</button>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="code">
+                <pre>// Adicionar subtarefa
+function adicionarSubtarefa(tarefaId, texto) {
+    const tarefa = tarefas.find(t => t.id === tarefaId);
+    if (tarefa) {
+        const subtarefa = {
+            id: Date.now(),
+            texto: texto,
+            completa: false
+        };
+        tarefa.subtarefas.push(subtarefa);
+        atualizarLista();
+        salvarTarefas();
+    }
+}
+
+// Completar subtarefa
+function completarSubtarefa(tarefaId, subtarefaId) {
+    const tarefa = tarefas.find(t => t.id === tarefaId);
+    if (tarefa) {
+        const subtarefa = tarefa.subtarefas.find(st => st.id === subtarefaId);
+        if (subtarefa) {
+            subtarefa.completa = !subtarefa.completa;
+            tarefa.completa = tarefa.subtarefas.every(st => st.completa);
+            atualizarLista();
+            salvarTarefas();
+        }
+    }
+}</pre>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>7. Filtros e Ordenação Aprimorados</h2>
+            <p>Melhoramos a organização dos filtros e botões de ordenação em seções distintas para melhor usabilidade.</p>
+            
+            <div class="code">
+                <pre>&lt;div class="filtros-container"&gt;
+    &lt;div class="filtros"&gt;
+        &lt;h3&gt;Filtrar por Status&lt;/h3&gt;
+        &lt;div class="botoes"&gt;
+            &lt;button id="todas" class="ativo"&gt;Todas&lt;/button&gt;
+            &lt;button id="ativas"&gt;Ativas&lt;/button&gt;
+            &lt;button id="completas"&gt;Completas&lt;/button&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    
+    &lt;div class="filtros-categoria"&gt;
+        &lt;h3&gt;Filtrar por Categoria&lt;/h3&gt;
+        &lt;div class="botoes"&gt;
+            &lt;button class="filtro-categoria ativo" data-categoria="todas"&gt;Todas&lt;/button&gt;
+            &lt;button class="filtro-categoria" data-categoria="trabalho"&gt;Trabalho&lt;/button&gt;
+            &lt;button class="filtro-categoria" data-categoria="pessoal"&gt;Pessoal&lt;/button&gt;
+            &lt;button class="filtro-categoria" data-categoria="estudos"&gt;Estudos&lt;/button&gt;
+            &lt;button class="filtro-categoria" data-categoria="outros"&gt;Outros&lt;/button&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    
+    &lt;div class="ordenacao"&gt;
+        &lt;h3&gt;Ordenar Tarefas&lt;/h3&gt;
+        &lt;div class="botoes"&gt;
+            &lt;button class="ordenar" data-criterio="data"&gt;Ordenar por Data&lt;/button&gt;
+            &lt;button class="ordenar" data-criterio="texto"&gt;Ordenar por Texto&lt;/button&gt;
+            &lt;button class="ordenar" data-criterio="status"&gt;Ordenar por Status&lt;/button&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</pre>
+            </div>
+            
+            <div class="demo">
+                <div class="filtros-container">
+                    <div class="filtros">
+                        <h3>Filtrar por Status</h3>
+                        <div class="botoes">
+                            <button class="filtro-btn ativo">Todas</button>
+                            <button class="filtro-btn">Ativas</button>
+                            <button class="filtro-btn">Completas</button>
+                        </div>
+                    </div>
+                    
+                    <div class="filtros-categoria">
+                        <h3>Filtrar por Categoria</h3>
+                        <div class="botoes">
+                            <button class="filtro-btn ativo">Todas</button>
+                            <button class="filtro-btn">Trabalho</button>
+                            <button class="filtro-btn">Pessoal</button>
+                            <button class="filtro-btn">Estudos</button>
+                            <button class="filtro-btn">Outros</button>
+                        </div>
+                    </div>
+                    
+                    <div class="ordenacao">
+                        <h3>Ordenar Tarefas</h3>
+                        <div class="botoes">
+                            <button class="ordenar-btn">Data ↑</button>
+                            <button class="ordenar-btn">Texto A-Z</button>
+                            <button class="ordenar-btn">Status</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="code">
+                <pre>// Event listeners para filtros de categoria
+document.querySelectorAll('.filtro-categoria').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.filtros-categoria .filtro-categoria').forEach(b => {
+            b.classList.remove('ativo');
+        });
+        btn.classList.add('ativo');
+        categoriaAtual = btn.dataset.categoria;
+        atualizarLista();
+    });
+});
+
+// Event listeners para filtros de status
+document.querySelectorAll('.filtros button').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.filtros button').forEach(b => {
+            b.classList.remove('ativo');
+        });
+        btn.classList.add('ativo');
+        filtroAtual = btn.id;
+        atualizarLista();
+    });
+});</pre>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>8. Interface Aprimorada</h2>
+            <p>Melhoramos a interface de adição de tarefas com um layout mais organizado e intuitivo.</p>
+            
+            <div class="code">
+                <pre>&lt;div class="input-container"&gt;
+    &lt;div class="input-row"&gt;
+        &lt;div class="input-group"&gt;
+            &lt;label for="tarefa"&gt;Nova Tarefa&lt;/label&gt;
+            &lt;input type="text" id="tarefa" placeholder="Digite uma nova tarefa..."&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    
+    &lt;div class="input-row"&gt;
+        &lt;div class="input-group"&gt;
+            &lt;label for="data-vencimento"&gt;Data de Vencimento&lt;/label&gt;
+            &lt;input type="date" id="data-vencimento"&gt;
+        &lt;/div&gt;
+        
+        &lt;div class="input-group"&gt;
+            &lt;label for="categoria"&gt;Categoria&lt;/label&gt;
+            &lt;select id="categoria"&gt;
+                &lt;option value=""&gt;Selecione uma categoria&lt;/option&gt;
+                &lt;option value="trabalho"&gt;Trabalho&lt;/option&gt;
+                &lt;option value="pessoal"&gt;Pessoal&lt;/option&gt;
+                &lt;option value="estudos"&gt;Estudos&lt;/option&gt;
+                &lt;option value="outros"&gt;Outros&lt;/option&gt;
+            &lt;/select&gt;
+        &lt;/div&gt;
+        
+        &lt;button id="adicionar"&gt;Adicionar Tarefa&lt;/button&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</pre>
+            </div>
+            
+            <div class="demo">
+                <div class="input-container">
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="demo-tarefa">Nova Tarefa</label>
+                            <input type="text" class="demo-input" id="demo-tarefa" placeholder="Digite uma nova tarefa...">
+                        </div>
+                    </div>
+                    
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="demo-data">Data de Vencimento</label>
+                            <input type="date" class="demo-input" id="demo-data">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="demo-categoria">Categoria</label>
+                            <select class="demo-select" id="demo-categoria">
+                                <option value="">Selecione uma categoria</option>
+                                <option value="trabalho">Trabalho</option>
+                                <option value="pessoal">Pessoal</option>
+                                <option value="estudos">Estudos</option>
+                                <option value="outros">Outros</option>
+                            </select>
+                        </div>
+                        
+                        <button class="demo-button">Adicionar Tarefa</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="code">
+                <pre>// Validação dos campos
+function adicionarTarefa() {
+    const texto = tarefaInput.value.trim();
+    const dataVencimento = document.getElementById('data-vencimento').value;
+    const categoria = document.getElementById('categoria').value;
+    
+    if (texto === '') {
+        alert('Por favor, digite uma tarefa!');
+        return;
+    }
+    
+    if (!dataVencimento) {
+        alert('Por favor, selecione uma data de vencimento!');
+        return;
+    }
+    
+    if (!categoria) {
+        alert('Por favor, selecione uma categoria!');
+        return;
+    }
+    
+    const tarefa = {
+        id: Date.now(),
+        texto: texto,
+        completa: false,
+        dataCriacao: new Date(),
+        dataVencimento: new Date(dataVencimento),
+        categoria: categoria,
+        subtarefas: []
+    };
+    
+    tarefas.push(tarefa);
+    atualizarLista();
+    salvarTarefas();
+}</pre>
+            </div>
+        </div>
+        
+        <a href="todo-list-app (1).html" class="voltar">Voltar para a Lista de Tarefas</a>
+    </div>
+</body>
+</html> 
